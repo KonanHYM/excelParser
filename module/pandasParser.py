@@ -15,7 +15,8 @@ ProfitList = [
     u'资产减值损失',
     u'投资净收益',
     u'营业利润',
-    u'营业外收支',
+    u'加：营业外收入',
+    u'减：营业外支出',
     u'利润总额',
     u'减：所得税',
     u'减：少数股东损益',
@@ -23,8 +24,8 @@ ProfitList = [
 ]
 
 CashFlowList = [
-    u'销售商品收现',
-    u'经营现金流',
+    u'销售商品、提供劳务收到的现金',
+    u'经营活动产生的现金流量净额',
 ]
 
 BalanceSheetList = [
@@ -66,6 +67,9 @@ def finalParser():
     profit = pd.read_excel(BEINGMATE['Profit'])#读取利润表
     profitSeason = pd.read_excel(BEINGMATE['Profit_Season'])#读取利润表(单季)
     balanceSheet = pd.read_excel(BEINGMATE['Balance_Sheet'])#读取资产负债表
+
+    cashFlow = pd.read_excel(BEINGMATE['Cash_Flow'])#读取现金流量表
+    cashFlowSeason = pd.read_excel(BEINGMATE['Cash_Flow_Season'])#读取现金流量表（单季）
     for final_types in final.columns:
         year = '20' + str(final_types)[0:2]
         reptype = getType(final_types = final_types)
@@ -120,9 +124,26 @@ def finalParser():
                     data_strip = data_index.strip()
                     if data_strip in BalanceSheetList:
                         final[final_types][data_strip] = data[data_index]
+
+        #处理现金流量表
+        data = detailParser(cashFlow, year, reptype)
+        if not data is None:
+            for data_index in data.index:
+                if not isinstance(data_index, float):
+                    data_strip = data_index.strip()
+                    if data_strip in CashFlowList:
+                        final[final_types][data_strip] = data[data_index]
+        #处理现金流量表（单季）
+        data = seasonParser(cashFlowSeason, year, season)
+        if not data is None:
+            for data_index in data.index:
+                if not isinstance(data_index, float):
+                    data_strip = data_index.strip()
+                    if data_strip in CashFlowList:
+                        final[final_types][data_strip] = data[data_index]
     # print final
     #生成最终版EXCEL文件
-    writer = pd.ExcelWriter('../files/output/1.xlsx')
+    writer = pd.ExcelWriter('../files/output/2.xlsx')
     final.to_excel(writer,'Sheet1')
     writer.save()
 
