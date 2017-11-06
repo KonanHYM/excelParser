@@ -11,3 +11,5 @@ BEINGMATE = {
     'Main_Business' : '../files/Beingmate/主营业务构成（按指标）.xlsx',
     'Balance_Sheet' : '../files/Beingmate/资产负债表.xlsx',
 }
+
+VBA = '../files/vba.xlsx'
